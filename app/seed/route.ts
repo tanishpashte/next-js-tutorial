@@ -2,10 +2,11 @@ import bcrypt from 'bcrypt';
 import postgres from 'postgres';
 import { invoices, customers, revenue, users } from '../lib/placeholder-data';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require', prepare: false });
 
 async function seedUsers() {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+  // await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+  console.log("adding users\n");
   await sql`
     CREATE TABLE IF NOT EXISTS users (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -26,12 +27,13 @@ async function seedUsers() {
     }),
   );
 
+  console.log("users added\n");
   return insertedUsers;
 }
 
 async function seedInvoices() {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
+  // await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+  console.log("adding invoices\n");
   await sql`
     CREATE TABLE IF NOT EXISTS invoices (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -51,13 +53,13 @@ async function seedInvoices() {
       `,
     ),
   );
-
+  console.log("added invoices\n");
   return insertedInvoices;
 }
 
 async function seedCustomers() {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
+  // await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+  console.log("adding customers\n");
   await sql`
     CREATE TABLE IF NOT EXISTS customers (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -76,11 +78,12 @@ async function seedCustomers() {
       `,
     ),
   );
-
+  console.log("added customers\n");
   return insertedCustomers;
 }
 
 async function seedRevenue() {
+  console.log("adding revenue\n");
   await sql`
     CREATE TABLE IF NOT EXISTS revenue (
       month VARCHAR(4) NOT NULL UNIQUE,
@@ -97,7 +100,7 @@ async function seedRevenue() {
       `,
     ),
   );
-
+  console.log("added revenue\n");
   return insertedRevenue;
 }
 
@@ -112,6 +115,7 @@ export async function GET() {
 
     return Response.json({ message: 'Database seeded successfully' });
   } catch (error) {
+    console.error('Failed to seed database:', error); 
     return Response.json({ error }, { status: 500 });
   }
 }
